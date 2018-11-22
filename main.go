@@ -16,27 +16,24 @@ func main(){
 		panic(err.Error())
 	}
 	fmt.Println("Connected Succesfull!")
-	defer db.Close()
-	/*
-	insert,err:=db.Query("insert into employee(name,city) values('cesar','callao'),('miguel','lima');")
-	if err !=nil{
-		panic(err.Error())
+
+	rows,err:=db.Query("select * from employee;")
+	checkErr(err)
+
+	for rows.Next(){
+		var eid int
+		var ename string
+		var ecity string
+		err=rows.Scan(&eid,&ename,&ecity)
+		checkErr(err)
+		fmt.Println(eid)
+		fmt.Println(ename)
+		fmt.Println(ecity)
 	}
-	fmt.Println("Succesfull insert employees for goblog db!")
-	defer insert.Close()
-	*/
-	results,err:=db.Query("select name from employee;")
+	defer db.Close()	
+}
+func checkErr(err error){
 	if err !=nil{
-		panic(err.Error())
-	}
-	fmt.Println("Bringing Server data to Output cmd -->")
-	for results.Next(){
-		var emp Emp
-		err=results.Scan(&emp.Name)
-		if err !=nil{
-			panic(err.Error())
-		}
-		
-		fmt.Println(emp.Name)
+		panic(err)
 	}
 }
