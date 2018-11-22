@@ -13,4 +13,10 @@ func main(){
 	}
 	fmt.Println("Connected Succesfull!")
 	defer db.Close()
+	insert,err:=db.Query("insert into employee(name,city) values('cesar','callao'),('miguel','lima');")
+	if err !=nil{
+		panic(err.Error())
+	}
+	fmt.Println("Succesfull insert employees for goblog db!")
+	defer insert.Close()
 }
