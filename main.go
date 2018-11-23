@@ -4,22 +4,26 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 )
-
-type Emp struct{
-	Name string `json:"name"`
+func checkErr(err error){
+	if err !=nil{
+		panic(err)
+	}
+}
+func dbConn()(db *sql.DB){
+	dbDriver:="mysql"
+	dbUser:="root"
+	dbPass:="root"
+	dbname:="goblog"
+	db,err:=sql.Open(dbDriver,dbUser+":"+dbPass+"@/"+dbname)
+	checkErr(err)
+	return db
 }
 func main(){
-
-	fmt.Println("GO - MSQL Server Connection!")
-	db,err:=sql.Open("mysql","root:root@tcp(localhost:3306)/goblog")
-	if err !=nil{
-		panic(err.Error())
-	}
-	fmt.Println("Connected Succesfull!")
-
+	db:=dbConn()
+	fmt.Println("Sucesful WebApp - Db Mysql Connection!")
 	rows,err:=db.Query("select * from employee;")
 	checkErr(err)
-
+	
 	for rows.Next(){
 		var eid int
 		var ename string
@@ -30,10 +34,6 @@ func main(){
 		fmt.Println(ename)
 		fmt.Println(ecity)
 	}
-	defer db.Close()	
+	defer db.Close()
 }
-func checkErr(err error){
-	if err !=nil{
-		panic(err)
-	}
-}
+
