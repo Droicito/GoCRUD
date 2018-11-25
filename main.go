@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"html/template"
+	"text/template"
 )
 type Employee struct{
 	Id int
@@ -31,7 +31,7 @@ func main(){
 	http.HandleFunc("/",Index)
 	http.ListenAndServe(":8080",nil)
 }
-var tmpl=template.Must(template.ParseGlob("form/*.html"))
+var tmpl=template.Must(template.ParseGlob("form/*"))
 func Index(w http.ResponseWriter,r *http.Request){
 	db:=dbConn()
 	selDB,err:=db.Query("select * from employee order by id desc;")
@@ -48,7 +48,7 @@ func Index(w http.ResponseWriter,r *http.Request){
 		emp.City=city
 		res=append(res,emp)
 	}
-	tmpl.ExecuteTemplate(w,"index.html",res)
+	tmpl.ExecuteTemplate(w,"index",res)
 	defer db.Close()
 }
 
