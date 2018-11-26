@@ -1,0 +1,28 @@
+{{define "index"}}
+    {{template "header"}}
+        {{template "menu"}}
+
+            <h2>Registered</h2>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <td> ID </td>
+                            <td> NAME </td>
+                            <td> CITY </td>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range .}}
+                        <tr>
+                            <td>{{.Id}}</td>
+                            <td>{{.Name}}</td>
+                            <td>{{.City}}</td>
+
+                        </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+    {{template "footer"}}
+{{end}}
+    
