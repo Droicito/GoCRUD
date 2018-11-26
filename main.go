@@ -31,10 +31,47 @@ func main(){
 	http.HandleFunc("/",Index)
 	http.HandleFunc("/new",New)
 	http.HandleFunc("/insert",Insert)
+	http.HandleFunc("/edit",Edit)
+	http.HandleFunc("/update",Update)
+
 
 	http.ListenAndServe(":8080",nil)
 }
 var tmpl=template.Must(template.ParseGlob("form/*"))
+
+func Update(w http.ResponseWriter,r *http.Request){
+	db:=dbConn()
+	if r.Method=="POST"{
+		id:=r.FormValue("eid")
+		name:=r.FormValue("name")
+		city:=r.FormValue("city")
+		upForm,err:=db.Prepare("update employee set name=?,city=? where id=?;")
+		checkErr(err)
+		upForm.Exec(name,city,id)
+		
+	}
+	defer db.Close()
+	http.Redirect(w,r,"/",301)
+}
+
+func Edit(w http.ResponseWriter,r *http.Request){
+	db:=dbConn()
+	nId:=r.URL.Query().Get("id")
+	seldb,err:=db.Query("select * from employee where id=?;",nId)
+	checkErr(err)
+	emp:=Employee{}
+	for seldb.Next(){
+		var id int
+		var name,city string
+		err=seldb.Scan(&id,&name,&city)
+		checkErr(err)
+		emp.Id=id
+		emp.Name=name
+		emp.City=city		
+	}
+	tmpl.ExecuteTemplate(w,"edit",emp)
+	defer db.Close()
+}
 
 func New(w http.ResponseWriter,r *http.Request){
 	tmpl.ExecuteTemplate(w,"new",nil)
