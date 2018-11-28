@@ -26,16 +26,30 @@ func dbConn()(db *sql.DB){
 
 func main(){
 	router:=gin.Default()
+	router.DELETE("/person",delPerson)
 
 	router.POST("/person",newPerson)
 
-	
 	router.GET("/person/:id",getPerson)
 	
 	router.GET("/people",getPeople)
 
 	fmt.Print(router.Run(":3000"))
 }
+// Postman : DELETE http://localhost:3000/person?id=4 
+func delPerson(c *gin.Context){
+	db:=dbConn()
+	id:=c.Query("id")
+	del,err:=db.Prepare("delete from person where id=?;")
+	checkErr(err)
+	del.Exec(id)
+	checkErr(err)
+	c.JSON(http.StatusOK,gin.H{
+		"message":fmt.Sprintf("Sucesful to delete user no :%s",id),
+	})
+
+}
+
 func newPerson(c *gin.Context){
 	db:=dbConn()
 	var buffer bytes.Buffer
