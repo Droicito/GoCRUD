@@ -1,7 +1,7 @@
 package main
 import(
 	"fmt"
-//	"bytes"
+	"bytes"
 	"net/http"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
@@ -26,11 +26,35 @@ func dbConn()(db *sql.DB){
 
 func main(){
 	router:=gin.Default()
+
+	router.POST("/person",newPerson)
+
+	
 	router.GET("/person/:id",getPerson)
 	
 	router.GET("/people",getPeople)
 
 	fmt.Print(router.Run(":3000"))
+}
+func newPerson(c *gin.Context){
+	db:=dbConn()
+	var buffer bytes.Buffer
+	fname:=c.PostForm("firstname")
+	lname:=c.PostForm("lastname")
+	new,err:=db.Prepare("insert into person(firstname,lastname) values(?,?);")
+	checkErr(err)
+	new.Exec(fname,lname)
+	checkErr(err)
+
+	buffer.WriteString(fname)
+	buffer.WriteString(" , ")
+	buffer.WriteString(lname)
+	defer new.Close()
+	name:=buffer.String()
+	c.JSON(http.StatusOK,gin.H{
+		"message":fmt.Sprintf("%s succesfull created! ",name),
+	})
+	
 }
 
 func getPerson(c *gin.Context){
