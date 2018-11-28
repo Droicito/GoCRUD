@@ -26,11 +26,32 @@ func dbConn()(db *sql.DB){
 
 func main(){
 	router:=gin.Default()
+	router.GET("/person/:id",getPerson)
+	
 	router.GET("/people",getPeople)
 
 	fmt.Print(router.Run(":3000"))
 }
 
+func getPerson(c *gin.Context){
+	var(
+		person Person
+		result gin.H
+	)
+	db:=dbConn()
+	id:=c.Param("id")
+	row:=db.QueryRow("select * from person where id=?;",id)
+	err:=row.Scan(&person.Id,&person.Firstname,&person.Lastname)
+	checkErr(err)
+	if err !=nil{
+		result=gin.H{"result":nil,"count":0}
+	}else{
+		result=gin.H{"result":person,"count":1}
+	}
+	
+	c.JSON(http.StatusOK,result)
+
+}
 func getPeople(c *gin.Context){
 var(
 	person Person
