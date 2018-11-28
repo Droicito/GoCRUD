@@ -23,9 +23,11 @@ func dbConn()(db *sql.DB){
 	checkErr(err)
 	return db
 }
-
+//Postman : Key:Content-type Value:application/x-www-form-urlencoded
 func main(){
 	router:=gin.Default()
+	router.PUT("/person",updtPerson)
+	
 	router.DELETE("/person",delPerson)
 
 	router.POST("/person",newPerson)
@@ -36,6 +38,34 @@ func main(){
 
 	fmt.Print(router.Run(":3000"))
 }
+func updtPerson(c *gin.Context){
+	db:=dbConn()
+	
+	var(
+		buffer bytes.Buffer
+	) 
+	id:=c.Query("id")
+	fn:=c.PostForm("fname")
+	ln:=c.PostForm("lname")
+	updt,err:=db.Prepare("update person set firstname=?,lastname=? where id=?")
+	checkErr(err)
+	updt.Exec(fn,ln,id)
+	checkErr(err)
+	
+	buffer.WriteString(fn)
+	buffer.WriteString(" ")
+	buffer.WriteString(ln)
+	defer updt.Close()
+	name:=buffer.String()
+	c.JSON(http.StatusOK,gin.H{
+		"message":fmt.Sprintf("Sucesfuly update user to %s ",name),
+	})
+
+
+
+
+}
+
 // Postman : DELETE http://localhost:3000/person?id=4 
 func delPerson(c *gin.Context){
 	db:=dbConn()
